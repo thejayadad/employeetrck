@@ -1,5 +1,6 @@
 import React from 'react'
 import SignOut from './signout'
+import ModalBtn from '../button/modal-btn'
 
 const Header = () => {
   return (
@@ -9,6 +10,7 @@ const Header = () => {
             Roster<span className='text-purple-600'>Relay</span>
           </span>
             <div className='flex items-center space-x-3'>
+              <ModalBtn />
             <SignOut />
             </div>
         </div>
