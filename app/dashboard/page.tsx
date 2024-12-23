@@ -1,7 +1,6 @@
 import React from 'react'
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
-import SignOut from '@/components/header/signout';
 
 const DashboardPage = async () => {
     const session = await auth()
@@ -10,10 +9,11 @@ const DashboardPage = async () => {
       redirect('/')
     }
   return (
-    <div>DashboardPage
-      {userEmail}
-      <SignOut />
-    </div>
+    <div className='w-full'>
+      <div className='flex flex-col'>
+        DashboardPAge
+      </div>
+    </div>  
   )
 }
 
