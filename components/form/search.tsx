@@ -7,7 +7,7 @@ const Search = () => {
     <form className="w-full mx-auto max-w-screen-sm relative">
     {/* Input Field */}
     <input
-      className="border w-full p-4 pl-12 pr-12 outline-none rounded-lg border-purple-200 bg-gray-200 text-gray-700"
+      className="border w-full p-4 pl-12 pr-12 outline-none rounded-lg border-purple-200 bg-gray-100 text-gray-700"
       placeholder="Search"
     />
     {/* Search Icon */}

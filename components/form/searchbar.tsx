@@ -3,7 +3,7 @@ import Search from './search'
 
 const SearchBar = () => {
   return (
-    <div className='w-full bg-gray-100 rounded-lg p-4'>
+    <div className='w-full bg-gray-50 rounded-lg p-4'>
         <Search />
     </div>
   )

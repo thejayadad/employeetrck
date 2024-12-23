@@ -8,7 +8,9 @@ const Header = () => {
           <span className="text-gray-600 text-xl lg:text-2xl font-extrabold">
             Roster<span className='text-purple-600'>Relay</span>
           </span>
-          <SignOut />
+            <div className='flex items-center space-x-3'>
+            <SignOut />
+            </div>
         </div>
     </header>
   )
