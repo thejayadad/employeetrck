@@ -1,12 +1,11 @@
 import React from "react";
 import { auth } from "@/auth";
-import { redirect } from "next/navigation";
-import SearchBar from "@/components/form/searchbar";
+import Search from "@/components/form/search";
 import { prisma } from "@/lib/prisma";
 import EmployeeCard from "@/components/card/employee-card";
 
 interface DashboardPageProps {
-  searchParams: { page?: string };
+  searchParams: Promise<{ query?: string; page?: string; limit?: string }>;
 }
 
 const DashboardPage = async ({ searchParams }: DashboardPageProps) => {
@@ -17,26 +16,38 @@ const DashboardPage = async ({ searchParams }: DashboardPageProps) => {
     throw new Error("User not authenticated");
   }
 
-  // Pagination parameters
-  const currentPage = parseInt(searchParams.page || "1", 10);
-  const itemsPerPage = 2;
-  const offset = (currentPage - 1) * itemsPerPage;
+  const resolvedParams = await searchParams;
+  const query = resolvedParams.query || "";
+  const currentPage = parseInt(resolvedParams.page || "1", 10);
+  const limit = parseInt(resolvedParams.limit || "2", 10);
+  const offset = (currentPage - 1) * limit;
 
-  // Fetch employees for the current page
+  // Dynamic where clause construction
+  const whereClause: Record<string, any> = { userEmail };
+  if (query) {
+    whereClause.OR = [
+      { name: { contains: query, mode: "insensitive" } },
+      { department: { contains: query, mode: "insensitive" } },
+    ];
+  }
+
   const employees = await prisma.employee.findMany({
-    where: { userEmail },
+    where: whereClause,
+    orderBy: { name: "asc" },
     skip: offset,
-    take: itemsPerPage,
+    take: limit,
   });
 
-  // Total employee count
-  const totalEmployees = await prisma.employee.count({ where: { userEmail } });
-  const totalPages = Math.ceil(totalEmployees / itemsPerPage);
+  const totalEmployees = await prisma.employee.count({
+    where: whereClause,
+  });
+
+  const totalPages = Math.ceil(totalEmployees / limit);
 
   return (
     <div className="w-full">
       <div className="flex flex-col mx-auto max-w-screen-lg px-4 py-8">
-        <SearchBar />
+        <Search query={query} />
         <div className="w-full bg-gray-50 rounded-lg p-4 mt-6">
           <div className="container px-5 py-12 mx-auto">
             <div className="flex flex-col text-center w-full mb-20">
@@ -64,7 +75,7 @@ const DashboardPage = async ({ searchParams }: DashboardPageProps) => {
               {Array.from({ length: totalPages }, (_, i) => (
                 <a
                   key={i}
-                  href={`?page=${i + 1}`}
+                  href={`?query=${query}&page=${i + 1}&limit=${limit}`}
                   className={`px-4 py-2 border rounded ${
                     i + 1 === currentPage
                       ? "bg-purple-600 text-white"
@@ -81,5 +92,6 @@ const DashboardPage = async ({ searchParams }: DashboardPageProps) => {
     </div>
   );
 };
+
 
 export default DashboardPage;

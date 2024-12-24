@@ -1,29 +1,29 @@
 import React from "react";
 import { FiSearch, FiX } from "react-icons/fi";
+import Form from "next/form";
+import SearchReset from "./reset-form";
 
-const Search = () => {
-  const query = 'no'
+
+const Search = ({ query }: { query?: string }) => {
   return (
-    <form className="w-full mx-auto max-w-screen-sm relative">
+    <Form action="/dashboard" scroll={false} className="w-full mx-auto max-w-screen-sm relative">
     {/* Input Field */}
     <input
+        name="query"
+        defaultValue={query}
       className="border w-full p-4 pl-12 pr-12 outline-none rounded-lg border-purple-200 bg-gray-100 text-gray-700"
       placeholder="Search"
     />
     {/* Search Icon */}
-    <div className="absolute inset-y-0 left-4 flex items-center text-gray-500">
+    <button className="absolute inset-y-0 left-4 flex items-center text-gray-500">
+      
       <FiSearch size={20} />
-    </div>
-    {/* Clear Icon */}
-    {/* {query && (
-      <button
-        type="button"
-        className="absolute inset-y-0 right-4 flex items-center text-gray-500 hover:text-gray-700"
-      >
-        <FiX size={20} />
-      </button>
-    )} */}
-  </form>
+    </button>
+    {query && (
+    <SearchReset />
+    )} 
+   
+  </Form>
   );
 };
 
