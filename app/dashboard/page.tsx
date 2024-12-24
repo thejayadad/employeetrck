@@ -5,7 +5,11 @@ import SearchBar from "@/components/form/searchbar";
 import { prisma } from "@/lib/prisma";
 import EmployeeCard from "@/components/card/employee-card";
 
-const DashboardPage = async () => {
+interface DashboardPageProps {
+  searchParams: { page?: string };
+}
+
+const DashboardPage = async ({ searchParams }: DashboardPageProps) => {
   const session = await auth();
   const userEmail = session?.user?.email;
 
@@ -13,9 +17,21 @@ const DashboardPage = async () => {
     throw new Error("User not authenticated");
   }
 
+  // Pagination parameters
+  const currentPage = parseInt(searchParams.page || "1", 10);
+  const itemsPerPage = 2;
+  const offset = (currentPage - 1) * itemsPerPage;
+
+  // Fetch employees for the current page
   const employees = await prisma.employee.findMany({
     where: { userEmail },
+    skip: offset,
+    take: itemsPerPage,
   });
+
+  // Total employee count
+  const totalEmployees = await prisma.employee.count({ where: { userEmail } });
+  const totalPages = Math.ceil(totalEmployees / itemsPerPage);
 
   return (
     <div className="w-full">
@@ -32,15 +48,31 @@ const DashboardPage = async () => {
               </p>
             </div>
             <div className="flex flex-wrap -m-2">
-            {employees.map((employee) => (
-              <EmployeeCard
-                key={employee.id}
-                id={employee.id}
-                name={employee.name}
-                role={employee.department}
-                yearsWorked={parseInt(employee.years, 10)}
-                userEmail={userEmail} // Pass userEmail here
-              />
+              {employees.map((employee) => (
+                <EmployeeCard
+                  key={employee.id}
+                  id={employee.id}
+                  name={employee.name}
+                  role={employee.department}
+                  yearsWorked={parseInt(employee.years, 10)}
+                  userEmail={userEmail}
+                />
+              ))}
+            </div>
+            {/* Pagination Controls */}
+            <div className="flex justify-center mt-8 space-x-4">
+              {Array.from({ length: totalPages }, (_, i) => (
+                <a
+                  key={i}
+                  href={`?page=${i + 1}`}
+                  className={`px-4 py-2 border rounded ${
+                    i + 1 === currentPage
+                      ? "bg-purple-600 text-white"
+                      : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                  }`}
+                >
+                  {i + 1}
+                </a>
               ))}
             </div>
           </div>
